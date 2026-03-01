@@ -3,55 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Typewriter Pro - Final</title>
+    <title>Typewriter Pro - Infinite Edition</title>
     <style>
-        /* CSS GỘP VÀO ĐÂY */
+        /* TOÀN BỘ GIAO DIỆN */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { height: 100%; width: 100%; overflow: hidden; background-color: #FFDDEE; font-family: 'Courier New', Courier, monospace; }
         
-        .container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+        body { 
+            background-color: #FFDDEE; 
+            font-family: 'Courier New', Courier, monospace;
+            overflow-y: auto; /* Cho phép cuộn trang khi giấy dài ra */
+            min-height: 100vh;
+            padding-bottom: 380px; /* Khoảng trống để không bị bàn phím che mất chữ cuối */
+        }
 
-        /* VÙNG GIẤY */
-        .paper-zone { flex: 1; overflow-y: auto; display: flex; justify-content: center; padding: 20px; }
+        /* KHỔ GIẤY VÔ HẠN */
+        .paper-zone { 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            padding: 40px 20px; 
+        }
+
         #paper { 
-            background: #f4f1ea; width: 95%; max-width: 800px; min-height: 100%; 
-            padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); outline: none; 
-            font-size: 22px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word;
+            background: #f4f1ea; 
+            width: 95%; 
+            max-width: 900px; 
+            min-height: 600px; 
+            height: auto; /* Giấy tự kéo dài vô hạn theo nội dung */
+            padding: 50px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+            outline: none; 
+            font-size: 24px; 
+            line-height: 1.6; 
+            white-space: pre-wrap; 
+            word-wrap: break-word; 
+            color: #333;
         }
 
-        /* VÙNG BÀN PHÍM */
-        .kb-zone { background: #111; padding: 10px 5px 30px 5px; display: flex; flex-direction: column; align-items: center; }
-        .row { display: flex; justify-content: center; margin: 4px 0; gap: 5px; width: 100%; }
-        .key { 
-            width: clamp(33px, 8vw, 55px); height: clamp(45px, 10vw, 60px);
-            background: #333; color: white; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            border-bottom: 4px solid #000; cursor: pointer; font-weight: bold; font-size: 18px;
-            user-select: none; -webkit-tap-highlight-color: transparent;
+        /* KHUNG ĐEN BÀN PHÍM CỐ ĐỊNH */
+        .kb-fixed { 
+            background: #111; 
+            padding: 20px 10px 45px 10px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            box-shadow: 0 -15px 35px rgba(0,0,0,0.6);
+            z-index: 9999;
         }
-        .key:active { transform: translateY(2px); border-bottom-width: 1px; background: #444; }
+
+        .row { display: flex; justify-content: center; margin: 8px 0; gap: 10px; width: 100%; }
+
+        /* CÁC PHÍM BỰ VÀ CÂN ĐỐI */
+        .key { 
+            width: clamp(45px, 9vw, 75px); 
+            height: clamp(55px, 11vw, 85px); 
+            background: #333; 
+            color: white; 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-bottom: 6px solid #000; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: clamp(18px, 4vw, 26px); 
+            user-select: none; 
+            -webkit-tap-highlight-color: transparent; 
+            transition: all 0.05s;
+        }
+
+        .key:active { transform: translateY(4px); border-bottom-width: 1px; background: #444; }
         
-        .wide { width: clamp(70px, 15vw, 100px); background: #444; font-size: 14px; }
-        .space { width: clamp(150px, 35vw, 400px); }
-        .enter { background: #e67e22; width: clamp(90px, 20vw, 130px); }
-        .save { background: #27ae60; width: clamp(70px, 15vw, 100px); }
+        /* PHÍM CHỨC NĂNG */
+        .wide { width: clamp(90px, 18vw, 140px); background: #444; font-size: 16px; }
+        .space { width: clamp(250px, 45vw, 650px); }
+        .enter { background: #e67e22; width: clamp(120px, 22vw, 180px); }
+        .save { background: #27ae60; width: clamp(90px, 18vw, 140px); }
         .active { background: #ff88aa !important; color: #000 !important; }
+
+        /* LỚP PHỦ LÀM MỜ GIÚP CHỮ CUỘN MƯỢT DƯỚI PHÍM */
+        .fade-bottom {
+            position: fixed;
+            bottom: 350px;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, #FFDDEE);
+            pointer-events: none;
+            z-index: 500;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="paper-zone">
-            <div id="paper" contenteditable="true" spellcheck="false" autofocus></div>
-        </div>
+    <div class="paper-zone">
+        <div id="paper" contenteditable="true" spellcheck="false" autofocus></div>
+    </div>
 
-        <div class="kb-zone">
-            <div id="kb-inner" style="width: 100%;"></div>
-        </div>
+    <div class="fade-bottom"></div>
+
+    <div class="kb-fixed">
+        <div id="kb-inner" style="width: 100%;"></div>
     </div>
 
     <script>
-        /* JAVASCRIPT GỘP VÀO ĐÂY */
         const paper = document.getElementById('paper');
         const kbInner = document.getElementById('kb-inner');
         let isNum = false;
@@ -108,18 +166,28 @@
             document.querySelector('.save').onclick = () => {
                 const blob = new Blob([paper.innerText], {type: 'text/plain'});
                 const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob); a.download = 'note.txt'; a.click();
+                a.href = URL.createObjectURL(blob); 
+                a.download = 'typing_note.txt'; 
+                a.click();
             };
         }
 
         function handle(k) {
-            if (k === '⌫') paper.innerText = paper.innerText.slice(0, -1);
-            else if (k === 'Enter') paper.innerHTML += '<br>';
-            else if (k === ' ') paper.innerHTML += '\u00A0';
-            else {
+            if (k === '⌫') {
+                paper.innerText = paper.innerText.slice(0, -1);
+            } else if (k === 'Enter') {
+                paper.innerHTML += '<br>';
+            } else if (k === ' ') {
+                paper.innerHTML += '\u00A0';
+            } else {
                 paper.innerText += (isCaps && !isNum && k.length === 1) ? k.toUpperCase() : k;
             }
-            document.querySelector('.paper-zone').scrollTop = 99999;
+            
+            // Ép trang web cuộn xuống khi gõ dòng mới
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
         }
 
         window.onload = render;
