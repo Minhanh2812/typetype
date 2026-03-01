@@ -3,38 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Typewriter Pro - Final Edition</title>
+    <title>Typewriter Reborn - Pro 40vh</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         body { 
-            background-color: #FFDDEE; 
-            font-family: 'Courier New', Courier, monospace;
-            overflow-y: auto !important; 
-            min-height: 100vh;
-            /* Padding bottom để không bị bàn phím che chữ cuối khi cuộn */
-            padding-bottom: 35vh; 
+            background: #FFDDEE; 
+            font-family: 'Courier New', monospace; 
+            overflow-y: auto; 
+            min-height: 100vh; 
+            padding-bottom: 45vh; 
         }
 
-        /* KHỔ GIẤY RỘNG SÁT MÉP - CHỪA LỀ 1CM (khoảng 40px) */
-        .paper-zone { 
-            width: 100%; 
-            display: flex; 
-            justify-content: center; 
-            padding: 20px 0;
-        }
-
+        /* GIẤY RỘNG SÁT MÉP - LỀ 1CM */
+        .paper-zone { width: 100%; display: flex; justify-content: center; padding: 20px 0; }
         #paper { 
             background: #f4f1ea; 
-            /* Chiều ngang rộng sát mép, chừa lề 1cm mỗi bên */
-            width: calc(100% - 80px) !important; 
-            max-width: 1400px !important; 
+            width: calc(100% - 40px) !important; /* Rộng sát mép */
+            max-width: 1400px; 
             min-height: 600px; 
-            height: auto !important; /* Giấy tự kéo dài vô hạn */
+            height: auto !important; 
             padding: 40px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            outline: none; 
-            font-size: 24px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+            outline: none; font-size: 24px; line-height: 1.6; 
+            white-space: pre-wrap; word-wrap: break-word; color: #333;
+        }
+
+        /* BÀN PHÍM CỐ ĐỊNH 40VH */
+        .kb-fixed { 
+            background: #111; 
+            position: fixed; 
+            bottom: 0; left: 0; width: 100%; 
+            height: 40vh !important; /* Hạ xuống 40vh theo ý bạn */
+            padding: 15px 10px; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999; 
+        }
+
+        /* TRẢI ĐẦY 100% CHIỀU NGANG */
+        .row { 
+            display: flex; 
+            justify-content: center; 
+            margin: 6px 0 !important; 
+            gap: 10px !important; 
+            width: 100% !important; 
+        }
+
+        /* PHÍM CHỮ HÌNH VUÔNG - KHÔNG BỊ BẸT */
+        .key { 
+            flex: 1; 
+            height: 80px !important; /* Tăng chiều cao để phím vuông vức */
+            background: #333; color: white; border-radius: 10px; 
+            display: flex; align-items: center; justify-content: center; 
+            border-bottom: 5px solid #000; cursor: pointer; 
+            font-weight: bold; font-size: 26px !important; 
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        .key:active { transform: translateY(3px); border-bottom-width: 1px; background: #444; }
+
+        /* NÚT CHỨC NĂNG CÂN ĐỐI */
+        .wide { flex: 1.5 !important; font-size: 18px !important; background: #444; }
+        .space { flex: 4 !important; }
+        .enter { flex: 2.5 !important; background: #e67e22 !important; }
+        .save { flex: 1.5 !important; background: #27ae60 !important; }
+    </style>
+</head>
+<body>
+    <div class="paper-zone"><div id="paper" contenteditable="true" spellcheck="false"></div></div>
+    <div class="kb-fixed"><div id="kb-inner" style="width:100%"></div></div>
+
+    <script>
+        const paper = document.getElementById('paper');
+        const kbInner = document.getElementById('kb-inner');
+        let isNum = false; let isCaps = false;
+
+        const layouts = {
+            abc: [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['z','x','c','v','b','n','m','⌫']],
+            num: [['1','2','3','4','5','6','7','8','9','0'],['!','@','#','$','%','^','&','*','(',')'],['-','/',':',';','?','.',',','+','=','⌫']]
+        };
+
+        function render() {
+            kbInner.innerHTML = '';
+            const rows = isNum ? layouts.num : layouts.abc;
+            rows.forEach(row => {
+                const rowDiv = document.createElement('div'); rowDiv.className = 'row';
+                row.forEach(k => {
+                    const btn = document.createElement('div'); btn.className = `key ${k === '⌫' ? 'wide' : ''}`;
+                    btn.innerText = (isCaps && !isNum && k.length === 1) ? k.toUpperCase() : k;
+                    const press = (e) => { e.preventDefault(); handle(k); };
+                    btn.addEventListener('touchstart', press, {passive: false});
+                    btn.addEventListener('mousedown', press);
+                    rowDiv.appendChild(btn);
+                });
+                kbInner.appendChild(rowDiv);
+            });
+            const foot = document.createElement('div'); foot.className = 'row';
+            foot.innerHTML = `<div class="key wide" id="m-btn">${isNum?'ABC':'123'}</div><div class="key wide" id="c-btn">CAPS</div><div class="key space">SPACE</div><div class="key enter">RETURN</div><div class="key save">SAVE</div>`;
+            kbInner.appendChild(foot);
+            document.getElementById('m-btn').onclick = () => { isNum = !isNum; render(); };
+            document.getElementById('c-btn').onclick = () => { isCaps = !isCaps; render(); };
+            document.querySelector('.space').onclick = () => handle(' ');
+            document.querySelector('.enter').onclick = () => handle('Enter');
+            document.querySelector('.save').onclick = () => {
+                const blob = new Blob([paper.innerText], {type: 'text/plain'});
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'note.txt'; a.click();
+            };
+        }
+
+        function handle(k) {
+            if (k === '⌫') paper.innerText = paper.innerText.slice(0, -1);
+            else if (k === 'Enter') paper.innerHTML += '<br>';
+            else if (k === ' ') paper.innerHTML += '\u00A0';
+            else paper.innerText += (isCaps && !isNum && k.length === 1) ? k.toUpperCase() : k;
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+        window.onload = render;
+    </script>
+</body>
+</html>            font-size: 24px; 
             line-height: 1.6; 
             white-space: pre-wrap; 
             word-wrap: break-word; 
