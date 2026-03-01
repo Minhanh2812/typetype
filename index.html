@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Typewriter Pro - Final Format</title>
+    <title>Typewriter Pro 3D - Final</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
@@ -37,48 +37,73 @@
             padding: 10px 10px 20px 10px; 
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 9999; 
+            box-shadow: 0 -10px 50px rgba(0,0,0,0.8);
         }
 
-        /* THANH ĐỊNH DẠNG CHỮ */
+        /* THANH ĐỊNH DẠNG CHỮ BỰ */
         .toolbar { 
             display: flex; 
-            justify-content: center; 
-            gap: 15px; 
-            margin-bottom: 10px; 
-            width: 100%;
+            justify-content: space-between; 
+            gap: 10px; 
+            margin-bottom: 15px; 
+            width: 98% !important;
         }
         .tool-btn {
-            background: #444; color: white; border: none; padding: 8px 20px;
-            border-radius: 5px; cursor: pointer; font-weight: bold; font-family: serif;
+            flex: 1;
+            height: 55px !important;
+            background: #222; color: white; border: none;
+            border-radius: 10px; cursor: pointer; font-weight: bold; 
+            font-size: 22px !important;
+            box-shadow: 0 4px 0 #000;
+            transition: all 0.1s;
         }
-        .tool-btn:active { background: #ff88aa; color: #000; }
+        .tool-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #000; background: #ff88aa; color: #000; }
 
         /* TRẢI ĐẦY 100% CHIỀU NGANG */
         .row { 
             display: flex; 
             justify-content: center; 
-            margin: 4px 0 !important; 
-            gap: 8px !important; 
+            margin: 6px 0 !important; 
+            gap: 12px !important; 
             width: 100% !important; 
         }
 
-        /* PHÍM CHỮ HÌNH VUÔNG */
+        /* HIỆU ỨNG PHÍM NỔI 3D MÁY ĐÁNH CHỮ */
         .key { 
             flex: 1; 
-            height: 75px !important; 
-            background: #333; color: white; border-radius: 8px; 
+            height: 80px !important; /* Độ cao vuông vức */
+            background: linear-gradient(145deg, #444, #222); /* Màu gradient tạo độ bóng */
+            color: white; 
+            border-radius: 12px; 
             display: flex; align-items: center; justify-content: center; 
-            border-bottom: 5px solid #000; cursor: pointer; 
-            font-weight: bold; font-size: 26px !important; 
+            cursor: pointer; 
+            font-weight: bold; font-size: 28px !important; 
             user-select: none; -webkit-tap-highlight-color: transparent;
+            
+            /* Đổ bóng 3 tầng để phím "nổi" lên khỏi khung đen */
+            border: 1px solid #555;
+            box-shadow: 
+                0 6px 0 #000,              /* Cạnh dưới phím */
+                0 8px 15px rgba(0,0,0,0.5), /* Bóng đổ xuống nền */
+                inset 0 2px 2px rgba(255,255,255,0.1); /* Độ bóng bề mặt */
+            
+            transition: all 0.05s;
         }
-        .key:active { transform: translateY(3px); border-bottom-width: 1px; background: #444; }
+
+        /* Hiệu ứng khi nhấn: Phím lún xuống thật sự */
+        .key:active { 
+            transform: translateY(4px); 
+            box-shadow: 
+                0 2px 0 #000, 
+                0 4px 10px rgba(0,0,0,0.5); 
+            background: #111;
+        }
 
         /* NÚT CHỨC NĂNG CÂN ĐỐI */
-        .wide { flex: 1.5 !important; font-size: 18px !important; background: #444; }
+        .wide { flex: 1.5 !important; font-size: 18px !important; background: #333; }
         .space { flex: 4 !important; }
-        .enter { flex: 2.5 !important; background: #e67e22 !important; }
-        .save { flex: 1.5 !important; background: #27ae60 !important; }
+        .enter { flex: 2.5 !important; background: #e67e22 !important; box-shadow: 0 6px 0 #8e44ad; }
+        .save { flex: 1.5 !important; background: #27ae60 !important; box-shadow: 0 6px 0 #1e8449; }
     </style>
 </head>
 <body>
@@ -86,9 +111,9 @@
     
     <div class="kb-fixed">
         <div class="toolbar">
-            <button class="tool-btn" onclick="format('bold')">B</button>
-            <button class="tool-btn" onclick="format('italic')" style="font-style: italic;">I</button>
-            <button class="tool-btn" onclick="format('underline')" style="text-decoration: underline;">U</button>
+            <button class="tool-btn" onclick="format('bold')" style="border-left: 6px solid #f1c40f;">B</button>
+            <button class="tool-btn" onclick="format('italic')" style="font-style: italic; border-left: 6px solid #3498db;">I</button>
+            <button class="tool-btn" onclick="format('underline')" style="text-decoration: underline; border-left: 6px solid #9b59b6;">U</button>
         </div>
         <div id="kb-inner" style="width:100%"></div>
     </div>
@@ -98,7 +123,6 @@
         const kbInner = document.getElementById('kb-inner');
         let isNum = false; let isCaps = false;
 
-        // Hàm định dạng chữ
         function format(cmd) {
             document.execCommand(cmd, false, null);
             paper.focus();
@@ -133,7 +157,7 @@
             document.querySelector('.enter').onclick = () => handle('Enter');
             document.querySelector('.save').onclick = () => {
                 const blob = new Blob([paper.innerText], {type: 'text/plain'});
-                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'note.txt'; a.click();
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'typing.txt'; a.click();
             };
         }
 
@@ -146,6 +170,7 @@
                 document.execCommand('insertText', false, char);
             }
             paper.focus();
+            window.scrollTo(0, document.body.scrollHeight);
         }
         window.onload = () => { render(); paper.focus(); };
     </script>
