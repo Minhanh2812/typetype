@@ -17,16 +17,16 @@
             font-size: 22px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; 
         }
 
-        /* BÀN PHÍM CHỈ CHIẾM ĐÚNG 1/4 MÀN HÌNH */
+        /* BÀN PHÍM HẠ XUỐNG 25% MÀN HÌNH */
 .kb-fixed { 
     background: #111; 
     position: fixed; 
     bottom: 0; 
     left: 0; 
     width: 100%; 
-    height: 25vh !important; /* Ép đúng 25% chiều cao màn hình */
-    min-height: 200px !important; 
-    padding: 10px 0 !important;
+    height: 25vh !important; /* Hạ xuống đúng 25% chiều cao trang */
+    min-height: 200px; 
+    padding: 10px 15px;
     display: flex; 
     flex-direction: column; 
     justify-content: center; 
@@ -38,15 +38,17 @@
 .row { 
     display: flex; 
     justify-content: center; 
-    margin: 2px 0 !important; 
-    gap: 8px !important; 
+    margin: 4px 0; 
+    gap: 8px; /* Khoảng cách giữa các phím */
     width: 100%; 
 }
 
-/* PHÍM TO VÀ CÂN ĐỐI TRONG KHUNG 1/4 */
+/* PHÍM GỌN LẠI VÀ FONT CHỮ TO RA */
 .key { 
-    width: clamp(45px, 8.5vw, 65px) !important; 
-    height: clamp(40px, 5vh, 50px) !important; 
+    /* Chiều rộng phím nhỏ lại một chút để không bị dính sát nhau */
+    width: clamp(40px, 8vw, 60px); 
+    /* Chiều cao phím dẹt xuống để vừa khung 25% */
+    height: clamp(45px, 5vh, 55px); 
     background: #333; 
     color: white; 
     border-radius: 8px; 
@@ -56,14 +58,19 @@
     border-bottom: 4px solid #000; 
     cursor: pointer; 
     font-weight: bold; 
-    font-size: 20px !important; 
+    /* FONT CHỮ TO RA CHO DỄ NHÌN */
+    font-size: 22px !important; 
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* CÁC NÚT CHỨC NĂNG DƯỚI CÙNG */
-.wide { width: clamp(80px, 15vw, 120px) !important; }
-.space { width: clamp(200px, 40vw, 500px) !important; }
-.enter { background: #e67e22 !important; width: clamp(100px, 20vw, 160px) !important; }
+.key:active { transform: translateY(3px); border-bottom-width: 1px; }
+
+/* ĐIỀU CHỈNH CÁC NÚT CHỨC NĂNG CHO CÂN ĐỐI */
+.wide { width: clamp(80px, 15vw, 110px); background: #444; font-size: 16px !important; }
+.space { width: clamp(200px, 40vw, 500px); }
+.enter { background: #e67e22; width: clamp(120px, 20vw, 180px); font-size: 16px !important; }
+.active { background: #ff88aa !important; color: #000 !important; }
     </style>
 </head>
 <body>
