@@ -3,331 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Typewriter Pro - Compact Keyboard</title>
+    <title>Typewriter Reborn</title>
     <style>
+        /* CSS Gộp - Đảm bảo không bị lỗi hiển thị code */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body { 
-            background-color: #FFDDEE; 
-            font-family: 'Courier New', Courier, monospace;
-            overflow-y: auto !important; 
-            min-height: 100vh;
-            /* Giảm khoảng cách dưới để khớp với bàn phím thấp hơn */
-            padding-bottom: 280px; 
-        }
+        body { background: #FFDDEE; font-family: 'Courier New', monospace; overflow-y: auto; min-height: 100vh; padding-bottom: 25vh; }
 
         /* GIẤY VÔ HẠN */
-        .paper-zone { 
-            width: 100%; 
-            display: flex; 
-            justify-content: center; 
-            padding: 30px 0;
-        }
-
+        .paper-zone { width: 100%; display: flex; justify-content: center; padding: 20px 0; }
         #paper { 
-            background: #f4f1ea; 
-            width: 92%; 
-            max-width: 850px; 
-            min-height: 600px; 
-            height: auto !important; 
-            padding: 40px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            outline: none; 
-            font-size: 24px; 
-            line-height: 1.6; 
-            white-space: pre-wrap; 
-            word-wrap: break-word; 
-            color: #333;
+            background: #f4f1ea; width: 90%; max-width: 800px; min-height: 500px; height: auto !important; 
+            padding: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); outline: none; 
+            font-size: 22px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; 
         }
 
-        /* BÀN PHÍM CHỈ CHIẾM 1/4 TRANG */
+        /* BÀN PHÍM 1/4 TRANG (25vh) */
         .kb-fixed { 
-            background: #111; 
-            padding: 10px 5px 25px 5px; /* Thu hẹp padding dọc */
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            position: fixed; 
-            bottom: 0; 
-            width: 100%; 
-            height: 30vh; /* Giới hạn chiều cao bàn phím ở mức 30% */
-            min-height: 250px;
-            z-index: 9999;
-            box-shadow: 0 -15px 35px rgba(0,0,0,0.5);
+            background: #111; position: fixed; bottom: 0; left: 0; width: 100%; 
+            height: 25vh; min-height: 200px; padding: 10px 5px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999; box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
         }
 
-        .row { 
-            display: flex; 
-            justify-content: center; 
-            margin: 3px 0; /* Thu hẹp khoảng cách giữa các hàng */
-            gap: 6px; 
-            width: 100%; 
-        }
-
-        /* ĐIỀU CHỈNH PHÍM GỌN GÀNG HƠN */
+        .row { display: flex; justify-content: center; margin: 3px 0; gap: 5px; width: 100%; }
         .key { 
-            width: clamp(40px, 8.5vw, 65px); 
-            height: clamp(45px, 6vh, 60px); /* Giảm chiều cao phím xuống */
-            background: #333; 
-            color: white; 
-            border-radius: 8px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            border-bottom: 4px solid #000; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 20px; 
-            user-select: none; 
-            -webkit-tap-highlight-color: transparent; 
+            width: clamp(35px, 8vw, 55px); height: clamp(40px, 5vh, 50px);
+            background: #333; color: white; border-radius: 6px; display: flex; 
+            align-items: center; justify-content: center; border-bottom: 3px solid #000; 
+            cursor: pointer; font-weight: bold; font-size: 18px; user-select: none;
         }
+        .key:active { transform: translateY(2px); border-bottom-width: 1px; }
 
-        .key:active { transform: translateY(2px); border-bottom-width: 1px; background: #444; }
-        
-        .wide { width: clamp(80px, 15vw, 120px); background: #444; font-size: 15px; }
-        .space { width: clamp(200px, 40vw, 550px); }
-        .enter { background: #e67e22; width: clamp(100px, 18vw, 160px); }
-        .save { background: #27ae60; width: clamp(80px, 15vw, 120px); }
+        /* Nút chức năng */
+        .wide { width: clamp(70px, 14vw, 100px); background: #444; font-size: 14px; }
+        .space { width: clamp(160px, 35vw, 450px); }
+        .enter { background: #e67e22; width: clamp(90px, 18vw, 140px); }
         .active { background: #ff88aa !important; color: #000 !important; }
-
     </style>
 </head>
 <body>
 
-    <div class="paper-zone">
-        <div id="paper" contenteditable="true" spellcheck="false" autofocus></div>
-    </div>
-
-    <div class="kb-fixed">
-        <div id="kb-inner" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center;"></div>
-    </div>
+    <div class="paper-zone"><div id="paper" contenteditable="true" spellcheck="false"></div></div>
+    <div class="kb-fixed"><div id="kb-inner" style="width:100%"></div></div>
 
     <script>
         const paper = document.getElementById('paper');
         const kbInner = document.getElementById('kb-inner');
-        let isNum = false;
-        let isCaps = false;
+        let isNum = false; let isCaps = false;
 
         const layouts = {
-            abc: [
-                ['q','w','e','r','t','y','u','i','o','p'],
-                ['a','s','d','f','g','h','j','k','l'],
-                ['z','x','c','v','b','n','m','⌫']
-            ],
-            num: [
-                ['1','2','3','4','5','6','7','8','9','0'],
-                ['!','@','#','$','%','^','&','*','(',')'],
-                ['-','/',':',';','?','.',',','+','=','⌫']
-            ]
+            abc: [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['z','x','c','v','b','n','m','⌫']],
+            num: [['1','2','3','4','5','6','7','8','9','0'],['!','@','#','$','%','^','&','*','(',')'],['-','/',':',';','?','.',',','+','=','⌫']]
         };
 
         function render() {
             kbInner.innerHTML = '';
             const rows = isNum ? layouts.num : layouts.abc;
-
             rows.forEach(row => {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'row';
+                const rowDiv = document.createElement('div'); rowDiv.className = 'row';
                 row.forEach(k => {
-                    const btn = document.createElement('div');
-                    btn.className = `key ${k === '⌫' ? 'wide' : ''}`;
+                    const btn = document.createElement('div'); btn.className = `key ${k === '⌫' ? 'wide' : ''}`;
                     btn.innerText = (isCaps && !isNum && k.length === 1) ? k.toUpperCase() : k;
-                    
-                    const press = (e) => { e.preventDefault(); handle(k); };
-                    btn.addEventListener('touchstart', press, {passive: false});
-                    btn.addEventListener('mousedown', press);
+                    btn.onmousedown = (e) => { e.preventDefault(); handle(k); };
                     rowDiv.appendChild(btn);
                 });
                 kbInner.appendChild(rowDiv);
             });
-
-            const footer = document.createElement('div');
-            footer.className = 'row';
-            footer.innerHTML = `
-                <div class="key wide" id="m-btn">${isNum ? 'ABC' : '123'}</div>
-                <div class="key wide ${isCaps ? 'active' : ''}" id="c-btn">CAPS</div>
-                <div class="key space">SPACE</div>
-                <div class="key enter">RETURN</div>
-                <div class="key save">SAVE</div>
-            `;
-            kbInner.appendChild(footer);
-
+            const foot = document.createElement('div'); foot.className = 'row';
+            foot.innerHTML = `<div class="key wide" id="m-btn">${isNum?'ABC':'123'}</div><div class="key wide ${isCaps?'active':''}" id="c-btn">CAPS</div><div class="key space">SPACE</div><div class="key enter">RETURN</div>`;
+            kbInner.appendChild(foot);
             document.getElementById('m-btn').onclick = () => { isNum = !isNum; render(); };
             document.getElementById('c-btn').onclick = () => { isCaps = !isCaps; render(); };
             document.querySelector('.space').onclick = () => handle(' ');
             document.querySelector('.enter').onclick = () => handle('Enter');
-            document.querySelector('.save').onclick = () => {
-                const blob = new Blob([paper.innerText], {type: 'text/plain'});
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob); a.download = 'typed_note.txt'; a.click();
-            };
         }
 
         function handle(k) {
-            if (k === '⌫') {
-                paper.innerText = paper.innerText.slice(0, -1);
-            } else if (k === 'Enter') {
-                paper.innerHTML += '<br>';
-            } else if (k === ' ') {
-                paper.innerHTML += '\u00A0';
-            } else {
-                paper.innerText += (isCaps && !isNum && k.length === 1) ? k.toUpperCase() : k;
-            }
-            
-            window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: 'smooth'
-            });
+            if (k === '⌫') paper.innerText = paper.innerText.slice(0, -1);
+            else if (k === 'Enter') paper.innerHTML += '<br>';
+            else if (k === ' ') paper.innerHTML += '\u00A0';
+            else paper.innerText += (isCaps && !isNum && k.length === 1) ? k.toUpperCase() : k;
+            window.scrollTo(0, document.body.scrollHeight);
         }
-
-        window.onload = render;
-    </script>
-</body>
-</html>            white-space: pre-wrap; 
-            word-wrap: break-word; 
-            color: #333;
-        }
-
-        /* BÀN PHÍM HẠ THẤP - CHỈ CHIẾM KHOẢNG 20-25% MÀN HÌNH */
-        .kb-fixed { 
-            background: #111; 
-            padding: 8px 5px 15px 5px; /* Giảm tối đa padding dọc */
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            position: fixed; 
-            bottom: 0; 
-            width: 100%; 
-            height: auto; /* Để tự thích ứng nhưng giới hạn phím */
-            max-height: 25vh; /* Ép tối đa 1/4 màn hình */
-            z-index: 9999;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-        }
-
-        .row { 
-            display: flex; 
-            justify-content: center; 
-            margin: 2px 0; /* Khoảng cách hàng cực hẹp */
-            gap: 5px; 
-            width: 100%; 
-        }
-
-        /* PHÍM DẸP HƠN ĐỂ HẠ CHIỀU CAO */
-        .key { 
-            width: clamp(38px, 8vw, 60px); 
-            height: clamp(38px, 5vh, 50px); /* Phím thấp hơn đáng kể */
-            background: #333; 
-            color: white; 
-            border-radius: 6px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            border-bottom: 3px solid #000; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 18px; /* Chữ nhỏ lại một chút cho cân đối */
-            user-select: none; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-
-        .key:active { transform: translateY(2px); border-bottom-width: 1px; background: #444; }
-        
-        .wide { width: clamp(70px, 14vw, 110px); background: #444; font-size: 14px; }
-        .space { width: clamp(180px, 35vw, 500px); }
-        .enter { background: #e67e22; width: clamp(90px, 16vw, 150px); }
-        .save { background: #27ae60; width: clamp(70px, 14vw, 110px); }
-        .active { background: #ff88aa !important; color: #000 !important; }
-
-    </style>
-</head>
-<body>
-
-    <div class="paper-zone">
-        <div id="paper" contenteditable="true" spellcheck="false" autofocus></div>
-    </div>
-
-    <div class="kb-fixed">
-        <div id="kb-inner" style="width: 100%;"></div>
-    </div>
-
-    <script>
-        const paper = document.getElementById('paper');
-        const kbInner = document.getElementById('kb-inner');
-        let isNum = false;
-        let isCaps = false;
-
-        const layouts = {
-            abc: [
-                ['q','w','e','r','t','y','u','i','o','p'],
-                ['a','s','d','f','g','h','j','k','l'],
-                ['z','x','c','v','b','n','m','⌫']
-            ],
-            num: [
-                ['1','2','3','4','5','6','7','8','9','0'],
-                ['!','@','#','$','%','^','&','*','(',')'],
-                ['-','/',':',';','?','.',',','+','=','⌫']
-            ]
-        };
-
-        function render() {
-            kbInner.innerHTML = '';
-            const rows = isNum ? layouts.num : layouts.abc;
-
-            rows.forEach(row => {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'row';
-                row.forEach(k => {
-                    const btn = document.createElement('div');
-                    btn.className = `key ${k === '⌫' ? 'wide' : ''}`;
-                    btn.innerText = (isCaps && !isNum && k.length === 1) ? k.toUpperCase() : k;
-                    
-                    const press = (e) => { e.preventDefault(); handle(k); };
-                    btn.addEventListener('touchstart', press, {passive: false});
-                    btn.addEventListener('mousedown', press);
-                    rowDiv.appendChild(btn);
-                });
-                kbInner.appendChild(rowDiv);
-            });
-
-            const footer = document.createElement('div');
-            footer.className = 'row';
-            footer.innerHTML = `
-                <div class="key wide" id="m-btn">${isNum ? 'ABC' : '123'}</div>
-                <div class="key wide ${isCaps ? 'active' : ''}" id="c-btn">CAPS</div>
-                <div class="key space">SPACE</div>
-                <div class="key enter">RETURN</div>
-                <div class="key save">SAVE</div>
-            `;
-            kbInner.appendChild(footer);
-
-            document.getElementById('m-btn').onclick = () => { isNum = !isNum; render(); };
-            document.getElementById('c-btn').onclick = () => { isCaps = !isCaps; render(); };
-            document.querySelector('.space').onclick = () => handle(' ');
-            document.querySelector('.enter').onclick = () => handle('Enter');
-            document.querySelector('.save').onclick = () => {
-                const blob = new Blob([paper.innerText], {type: 'text/plain'});
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob); a.download = 'typed_note.txt'; a.click();
-            };
-        }
-
-        function handle(k) {
-            if (k === '⌫') {
-                paper.innerText = paper.innerText.slice(0, -1);
-            } else if (k === 'Enter') {
-                paper.innerHTML += '<br>';
-            } else if (k === ' ') {
-                paper.innerHTML += '\u00A0';
-            } else {
-                paper.innerText += (isCaps && !isNum && k.length === 1) ? k.toUpperCase() : k;
-            }
-            
-            window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: 'smooth'
-            });
-        }
-
         window.onload = render;
     </script>
 </body>
