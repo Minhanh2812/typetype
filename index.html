@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Typewriter Reborn - Pro 40vh</title>
+    <title>Typewriter Pro - Final Format</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
@@ -18,7 +18,7 @@
         .paper-zone { width: 100%; display: flex; justify-content: center; padding: 20px 0; }
         #paper { 
             background: #f4f1ea; 
-            width: calc(100% - 40px) !important; /* Rộng sát mép */
+            width: calc(100% - 40px) !important; 
             max-width: 1400px; 
             min-height: 600px; 
             height: auto !important; 
@@ -33,8 +33,124 @@
             background: #111; 
             position: fixed; 
             bottom: 0; left: 0; width: 100%; 
-            height: 40vh !important; /* Hạ xuống 40vh theo ý bạn */
-            padding: 15px 10px; 
+            height: 40vh !important; 
+            padding: 10px 10px 20px 10px; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999; 
+        }
+
+        /* THANH ĐỊNH DẠNG CHỮ */
+        .toolbar { 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
+            margin-bottom: 10px; 
+            width: 100%;
+        }
+        .tool-btn {
+            background: #444; color: white; border: none; padding: 8px 20px;
+            border-radius: 5px; cursor: pointer; font-weight: bold; font-family: serif;
+        }
+        .tool-btn:active { background: #ff88aa; color: #000; }
+
+        /* TRẢI ĐẦY 100% CHIỀU NGANG */
+        .row { 
+            display: flex; 
+            justify-content: center; 
+            margin: 4px 0 !important; 
+            gap: 8px !important; 
+            width: 100% !important; 
+        }
+
+        /* PHÍM CHỮ HÌNH VUÔNG */
+        .key { 
+            flex: 1; 
+            height: 75px !important; 
+            background: #333; color: white; border-radius: 8px; 
+            display: flex; align-items: center; justify-content: center; 
+            border-bottom: 5px solid #000; cursor: pointer; 
+            font-weight: bold; font-size: 26px !important; 
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        .key:active { transform: translateY(3px); border-bottom-width: 1px; background: #444; }
+
+        /* NÚT CHỨC NĂNG CÂN ĐỐI */
+        .wide { flex: 1.5 !important; font-size: 18px !important; background: #444; }
+        .space { flex: 4 !important; }
+        .enter { flex: 2.5 !important; background: #e67e22 !important; }
+        .save { flex: 1.5 !important; background: #27ae60 !important; }
+    </style>
+</head>
+<body>
+    <div class="paper-zone"><div id="paper" contenteditable="true" spellcheck="false"></div></div>
+    
+    <div class="kb-fixed">
+        <div class="toolbar">
+            <button class="tool-btn" onclick="format('bold')">B</button>
+            <button class="tool-btn" onclick="format('italic')" style="font-style: italic;">I</button>
+            <button class="tool-btn" onclick="format('underline')" style="text-decoration: underline;">U</button>
+        </div>
+        <div id="kb-inner" style="width:100%"></div>
+    </div>
+
+    <script>
+        const paper = document.getElementById('paper');
+        const kbInner = document.getElementById('kb-inner');
+        let isNum = false; let isCaps = false;
+
+        // Hàm định dạng chữ
+        function format(cmd) {
+            document.execCommand(cmd, false, null);
+            paper.focus();
+        }
+
+        const layouts = {
+            abc: [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['z','x','c','v','b','n','m','⌫']],
+            num: [['1','2','3','4','5','6','7','8','9','0'],['!','@','#','$','%','^','&','*','(',')'],['-','/',':',';','?','.',',','+','=','⌫']]
+        };
+
+        function render() {
+            kbInner.innerHTML = '';
+            const rows = isNum ? layouts.num : layouts.abc;
+            rows.forEach(row => {
+                const rowDiv = document.createElement('div'); rowDiv.className = 'row';
+                row.forEach(k => {
+                    const btn = document.createElement('div'); btn.className = `key ${k === '⌫' ? 'wide' : ''}`;
+                    btn.innerText = (isCaps && !isNum && k.length === 1) ? k.toUpperCase() : k;
+                    const press = (e) => { e.preventDefault(); handle(k); };
+                    btn.addEventListener('touchstart', press, {passive: false});
+                    btn.addEventListener('mousedown', press);
+                    rowDiv.appendChild(btn);
+                });
+                kbInner.appendChild(rowDiv);
+            });
+            const foot = document.createElement('div'); foot.className = 'row';
+            foot.innerHTML = `<div class="key wide" id="m-btn">${isNum?'ABC':'123'}</div><div class="key wide" id="c-btn">CAPS</div><div class="key space">SPACE</div><div class="key enter">RETURN</div><div class="key save">SAVE</div>`;
+            kbInner.appendChild(foot);
+            document.getElementById('m-btn').onclick = () => { isNum = !isNum; render(); };
+            document.getElementById('c-btn').onclick = () => { isCaps = !isCaps; render(); };
+            document.querySelector('.space').onclick = () => handle(' ');
+            document.querySelector('.enter').onclick = () => handle('Enter');
+            document.querySelector('.save').onclick = () => {
+                const blob = new Blob([paper.innerText], {type: 'text/plain'});
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'note.txt'; a.click();
+            };
+        }
+
+        function handle(k) {
+            if (k === '⌫') document.execCommand('delete', false, null);
+            else if (k === 'Enter') document.execCommand('insertLineBreak');
+            else if (k === ' ') document.execCommand('insertText', false, '\u00A0');
+            else {
+                let char = (isCaps && !isNum && k.length === 1) ? k.toUpperCase() : k;
+                document.execCommand('insertText', false, char);
+            }
+            paper.focus();
+        }
+        window.onload = () => { render(); paper.focus(); };
+    </script>
+</body>
+</html>            padding: 15px 10px; 
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 9999; 
         }
